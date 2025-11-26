@@ -1,42 +1,41 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import { BasePage } from "../base.page";
+
+export const allCollapsibleBlocks = [
+    "Activity",
+    "At a Glance",
+    "WordPress Events and News",
+    "Site Health Status"
+]
+
+export type CollapsibleBlock = typeof allCollapsibleBlocks[number];
 
 export class DashboardPage extends BasePage {
 
     readonly dashboardPath = 'wp-admin'
-    readonly dashboardHeading = '//h1[contains(text(), "Dashboard")]';
 
     constructor(page: Page) {
         super(page)
     }
 
+    get dashboardLocs() {
+        return {
+            heading: '//h1[contains(text(), "Dashboard")]',
+            section: (name: CollapsibleBlock) => `//h2[normalize-space()="${name}"]`
+        }
+    }
+
     async gotoDashboard() {
-        this.page.goto(this.dashboardPath)
+        this.page.goto(`/${this.dashboardPath}`)
     }
 
     async verifyDashboardPresence() {
-        return this.page.locator(this.dashboardHeading).isVisible();
+        await expect(this.locator(this.dashboardLocs.heading)).toBeVisible();
     }
 
-    async verifyDashboardActivity() {
-        return this.page.locator('//h2[normalize-space()="Activity"]').isVisible();
+    async verifyCollapsibleBlocks() {
+        for (const blockName of allCollapsibleBlocks) {
+            await expect(this.locator(this.dashboardLocs.section(blockName))).toBeVisible();
+        }
     }
-
-    async verifyDashboardAtAGlance() {
-        return this.page.locator('//h2[normalize-space()="At A Glance"]').isVisible();
-    }
-
-    async verifyDashboardNewsletter() {
-        return this.page.locator('//h2[normalize-space()="Newsletter"]').isVisible();
-    }
-
-    async verifyDashboardSiteHealthStatus() {
-        return this.page.locator('//h2[normalize-space()="Site Health Status"]').isVisible();
-    }
-
-    async logout() {
-        await this.page.locator('#wp-admin-bar-my-account').hover();
-        await this.page.locator('#wp-admin-bar-logout').click();
-    }
-
 }

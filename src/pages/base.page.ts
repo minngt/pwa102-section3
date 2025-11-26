@@ -8,4 +8,8 @@ export class BasePage {
         this.page = page
         this.baseUrl = process.env.BASE_URL as string;
     }
+
+    locator(locator: string) {
+        return this.page.locator(locator)
+    }
 }

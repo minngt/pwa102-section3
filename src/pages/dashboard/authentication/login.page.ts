@@ -3,23 +3,28 @@ import { DashboardPage } from "../dashboard-base.page";
 
 export class LoginPage extends DashboardPage {
 
-    readonly usernameLocator = '//input[@id="user_login"]';
-    readonly passwordLocator = '#user_pass';
-    readonly loginButtonLocator = '#wp-submit';
-    readonly errorMessageLocator = '#login_error';
-
     constructor(page: Page) {
         super(page)
     }
 
+    get loginLocs() {
+        return {
+            username: '//input[@id="user_login"]',
+            password: '#user_pass',
+            btnLogin: '#wp-submit',
+            errorMsg: '#login_error'
+        }
+    }
+
     async navigateToLoginPage() {
-        await this.page.goto(`${this.baseUrl}/${this.dashboardPath}`)
+        await this.page.goto(`/${this.dashboardPath}`)
     }
 
     async login(username: string, password: string) {
-        await this.page.locator(this.usernameLocator).fill(username);
-        await this.page.locator(this.passwordLocator).fill(password);
-        await this.page.locator(this.loginButtonLocator).click();
+        const loginLocs = this.loginLocs
+        await this.locator(loginLocs.username).fill(username);
+        await this.locator(loginLocs.password).fill(password);
+        await this.locator(loginLocs.btnLogin).click();
     }
 
 }

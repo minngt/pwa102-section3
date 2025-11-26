@@ -1,0 +1,28 @@
+{
+    "common": {
+        "suite_config": {
+            "name": "Minh",
+            "username": "pwa_student"
+        },
+        "case_config": {
+            "LOGIN_001": {}
+        }
+    },
+    "by_env": {
+        "dev": {
+            "suite_config": {
+                "address": "Ha Noi"
+            },
+            "case_config": {
+                "LOGIN_001": {
+                }
+            }
+        },
+        "production": {
+            "case_config": {
+                "LOGIN_001": {
+                }
+            }
+        }
+    }
+}
