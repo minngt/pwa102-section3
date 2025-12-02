@@ -1,0 +1,29 @@
+a. 0 9 * * * 
+vào 9h:00 mỗi ngày
+
+b. */15 * * * *
+Mỗi 15 phút
+
+c. 30 6 * * 1-5
+Vào 6:30 mỗi ngày từ thứ 2 tới thứ 6
+
+d. 0 0 1 * *
+Vào 0:00 ngày 1 của tháng
+
+e. 0 */2 * * *
+Vào phút thứ 0 mỗi 2 tiếng
+
+f. 0 22 * * 0
+Vào 22:00 ngày chủ nhật
+
+g. 15 14 1 1 *
+Vào 14:15 ngày 1 tháng 1
+
+h. 0 9-18 * * 1-5
+Từ 9 đến 18 giờ từ thứ 2 tới thứ 6
+
+i. */5 8-20 * * *
+Mỗi 5 phút từ 8:00 tới 20:59 mỗi ngày
+
+j. 0 3 1,15 * *
+Vào 3:00 ngày 1 và ngày 15 

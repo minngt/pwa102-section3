@@ -1,0 +1,29 @@
+a. lúc 2:00 sáng mỗi ngày
+0 2 * * *
+
+b. mỗi 30 phút
+*/30 * * * *
+
+c. lúc 8:00 sáng thứ Hai hàng tuần
+0 8 * * 1
+
+d. vào ngày đầu tiên mỗi tháng lúc 0:00
+0 0 1 * *
+
+e. mỗi 6 giờ
+0 */6 * * *
+
+f. lúc 9:00 sáng các ngày trong tuần (thứ 2 - thứ 6)
+0 9 * * 1-5
+
+g. mỗi 10 phút trong khoảng 8:00 - 17:00
+*/10 8-17 * * *
+
+h. lúc 23:30 vào Chủ nhật hàng tuần
+30 23 * * 0
+
+i. mỗi 5 phút, ẩn toàn bộ output
+*/5 * * * *
+
+j. lúc 0:00 ngày 1 tháng 1, 4, 7, 10 (đầu mỗi quý)
+0 0 1 1,4,7,10 *
