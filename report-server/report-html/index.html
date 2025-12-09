@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Better Bytes Academy - Playwright Reporter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .info {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info span {
+            margin-right: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #fee;
+            color: #c00;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .reports-section {
+            margin-top: 30px;
+        }
+
+        .reports-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .reports-header h2 {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .report-count {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .search-box {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 200px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        th:hover {
+            background: #e9ecef;
+        }
+
+        th.sortable:after {
+            content: '↕';
+            position: absolute;
+            right: 10px;
+            opacity: 0.3;
+        }
+
+        th.sort-asc:after {
+            content: '↑';
+            opacity: 1;
+        }
+
+        th.sort-desc:after {
+            content: '↓';
+            opacity: 1;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        td {
+            padding: 12px;
+            color: #212529;
+        }
+
+        .file-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            font-size: 18px;
+        }
+
+        .file-link {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .file-link:hover {
+            text-decoration: underline;
+        }
+
+        .file-size {
+            color: #6c757d;
+            white-space: nowrap;
+        }
+
+        .file-date {
+            color: #6c757d;
+            white-space: nowrap;
+        }
+
+        .no-reports {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .refresh-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            color: #333;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .refresh-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .open-report-btn {
+            padding: 6px 12px;
+            background: #0066cc;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .open-report-btn:hover {
+            background: #0052a3;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+
+            .search-box {
+                width: 150px;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .file-icon {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Better Bytes Academy - Playwright Reporter</h1>
+        <div class="subtitle">Test Reports Dashboard</div>
+        <div class="info">
+            <span><strong>Made by:</strong> [Name]</span>
+            <span><strong>Class:</strong> [Class]</span>
+        </div>
+
+        <div id="reports-container">
+            <div class="loading">Loading reports...</div>
+        </div>
+    </div>
+
+    <script>
+        let allReports = [];
+        let currentSort = { column: 'date', order: 'desc' };
+
+        function getFileIcon(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            const icons = {
+                'html': '📄',
+                'htm': '📄',
+                'zip': '📦',
+                'pdf': '📑',
+                'json': '📊',
+                'xml': '📋',
+                'txt': '📝',
+                'log': '📜'
+            };
+            return icons[ext] || '📎';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            if (bytes === null || bytes === undefined) return '-';
+            
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return dateStr;
+            
+            const options = {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function parseDirectoryListing(html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Find all links in the pre tag
+            const preElement = doc.querySelector('pre');
+            if (!preElement) return [];
+            
+            const links = preElement.querySelectorAll('a');
+            const reports = [];
+            
+            // Get the text content and split by lines to parse file info
+            const lines = preElement.innerHTML.split('\n');
+            
+            links.forEach((link, index) => {
+                const href = link.getAttribute('href');
+                const fileName = link.textContent.trim();
+                
+                // Skip parent directory link
+                if (href === '../' || fileName === '../') return;
+                
+                // Find the corresponding line for this file
+                const fileLine = lines.find(line => line.includes(`"${href}"`));
+                
+                if (fileLine) {
+                    // Parse the line to extract date and size
+                    // Format: <a href="abc.zip">abc.zip</a>  06-Sep-2025 09:52  0
+                    const parts = fileLine.replace(/<[^>]*>/g, '').trim().split(/\s+/);
+                    
+                    let dateStr = '';
+                    let timeStr = '';
+                    let size = 0;
+                    
+                    // Find date pattern (DD-Mon-YYYY)
+                    for (let i = 0; i < parts.length; i++) {
+                        if (parts[i].match(/\d{2}-\w{3}-\d{4}/)) {
+                            dateStr = parts[i];
+                            if (parts[i + 1] && parts[i + 1].match(/\d{2}:\d{2}/)) {
+                                timeStr = parts[i + 1];
+                            }
+                            if (parts[i + 2]) {
+                                size = parseInt(parts[i + 2]) || 0;
+                            }
+                            break;
+                        }
+                    }
+                    
+                    // Combine date and time
+                    const fullDate = dateStr && timeStr ? `${dateStr} ${timeStr}` : dateStr;
+                    
+                    reports.push({
+                        name: fileName,
+                        url: `/reports/${href}`,
+                        date: fullDate,
+                        size: size,
+                        type: fileName.split('.').pop().toLowerCase()
+                    });
+                }
+            });
+            
+            return reports;
+        }
+
+        function sortReports(reports, column, order) {
+            return [...reports].sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+                
+                if (column === 'date') {
+                    aVal = new Date(aVal).getTime() || 0;
+                    bVal = new Date(bVal).getTime() || 0;
+                } else if (column === 'size') {
+                    aVal = aVal || 0;
+                    bVal = bVal || 0;
+                }
+                
+                if (aVal < bVal) return order === 'asc' ? -1 : 1;
+                if (aVal > bVal) return order === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
+        function handleSort(column) {
+            if (currentSort.column === column) {
+                currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.order = column === 'name' ? 'asc' : 'desc';
+            }
+            renderReports(allReports);
+        }
+
+        function filterReports(searchTerm) {
+            if (!searchTerm) return allReports;
+            
+            const term = searchTerm.toLowerCase();
+            return allReports.filter(report => 
+                report.name.toLowerCase().includes(term)
+            );
+        }
+
+        function renderReports(reports) {
+            const container = document.getElementById('reports-container');
+            
+            if (reports.length === 0) {
+                container.innerHTML = `
+                    <div class="no-reports">
+                        <p>No reports found in /reports/ directory</p>
+                        <button class="refresh-btn" onclick="fetchReports()">↻ Retry</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedReports = sortReports(reports, currentSort.column, currentSort.order);
+            
+            container.innerHTML = `
+                <div class="reports-section">
+                    <div class="reports-header">
+                        <h2>Available Test Reports</h2>
+                        <div class="header-controls">
+                            <input 
+                                type="text" 
+                                class="search-box" 
+                                placeholder="Search reports..." 
+                                onkeyup="handleSearch(this.value)"
+                            />
+                            <span class="report-count">${reports.length} file(s)</span>
+                            <button class="refresh-btn" onclick="fetchReports()">↻ Refresh</button>
+                        </div>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="sortable ${currentSort.column === 'name' ? 'sort-' + currentSort.order : ''}"
+                                    onclick="handleSort('name')">Name</th>
+                                <th class="sortable ${currentSort.column === 'size' ? 'sort-' + currentSort.order : ''}"
+                                    onclick="handleSort('size')">Size</th>
+                                <th class="sortable ${currentSort.column === 'date' ? 'sort-' + currentSort.order : ''}"
+                                    onclick="handleSort('date')">Modified</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sortedReports.map(report => `
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <span class="file-icon">${getFileIcon(report.name)}</span>
+                                            <a href="${report.url}" class="file-link">${report.name}</a>
+                                        </div>
+                                    </td>
+                                    <td class="file-size">${formatFileSize(report.size)}</td>
+                                    <td class="file-date">${formatDate(report.date)}</td>
+                                    <td>
+                                        <button class="open-report-btn" onclick="openTraceViewer('${report.url}')">
+                                            Open Report
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function handleSearch(searchTerm) {
+            const filtered = filterReports(searchTerm);
+            renderReports(filtered);
+        }
+
+        function openTraceViewer(reportUrl) {
+            // Get the full URL of the report file
+            const fullUrl = new URL(reportUrl, window.location.href).href;
+
+            // Open Playwright Trace Viewer with the report URL
+            const traceViewerUrl = `https://trace.playwright.dev?trace=${encodeURIComponent(fullUrl)}`;
+            window.open(traceViewerUrl, '_blank');
+        }
+
+        async function fetchReports() {
+            const container = document.getElementById('reports-container');
+            
+            // Disable refresh button during fetch
+            const refreshBtn = document.querySelector('.refresh-btn');
+            if (refreshBtn) {
+                refreshBtn.disabled = true;
+                refreshBtn.textContent = '⟳ Loading...';
+            }
+            
+            try {
+                const response = await fetch('/reports/');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const text = await response.text();
+                allReports = parseDirectoryListing(text);
+                renderReports(allReports);
+                
+            } catch (error) {
+                console.error('Error fetching reports:', error);
+                
+                container.innerHTML = `
+                    <div class="error">
+                        Unable to load reports: ${error.message}
+                    </div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button class="refresh-btn" onclick="fetchReports()">↻ Try Again</button>
+                    </div>
+                `;
+            } finally {
+                // Re-enable refresh button
+                const refreshBtn = document.querySelector('.refresh-btn');
+                if (refreshBtn && refreshBtn.textContent === '⟳ Loading...') {
+                    refreshBtn.disabled = false;
+                    refreshBtn.textContent = '↻ Refresh';
+                }
+            }
+        }
+
+        // Load reports when page loads
+        document.addEventListener('DOMContentLoaded', fetchReports);
+    </script>
+</body>
+</html>
